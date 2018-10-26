@@ -7,10 +7,10 @@ cas:
 app:
   server:
     host:
-      url: http://10.10.1.79:8080  #应用访问地址
+      url: http://10.10.1.79:7070  #应用访问地址
   login:
     url: /login   #应用登录地址
   logout:
     url: /logout  #应用登出地址
 server:
-  port: 8080
+  port: 7070

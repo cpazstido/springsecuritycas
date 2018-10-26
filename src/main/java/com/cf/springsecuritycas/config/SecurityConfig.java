@@ -3,8 +3,10 @@ package com.cf.springsecuritycas.config;
 
 import com.cf.springsecuritycas.service.CustomUserDetailsService;
 import org.jasig.cas.client.session.SingleSignOutFilter;
+import org.jasig.cas.client.session.SingleSignOutHttpSessionListener;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.cas.ServiceProperties;
@@ -155,5 +157,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         LogoutFilter logoutFilter = new LogoutFilter(casProperties.getCasServerLogoutUrl(), new SecurityContextLogoutHandler());
         logoutFilter.setFilterProcessesUrl(casProperties.getAppLogoutUrl());
         return logoutFilter;
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean<SingleSignOutHttpSessionListener> singleSignOutHttpSessionListener(){
+        ServletListenerRegistrationBean<SingleSignOutHttpSessionListener> servletListenerRegistrationBean =
+                new ServletListenerRegistrationBean<>();
+        servletListenerRegistrationBean.setListener(new SingleSignOutHttpSessionListener());
+        return servletListenerRegistrationBean;
     }
 }
