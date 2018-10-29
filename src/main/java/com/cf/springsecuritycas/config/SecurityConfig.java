@@ -55,20 +55,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()//配置安全策略
-                //.antMatchers("/","/hello").permitAll()//定义/请求不需要验证
-                .anyRequest().authenticated()//其余的所有请求都需要验证
+        http
+                .formLogin()
                 .and()
                 .logout()
                 .permitAll()//定义logout不需要验证
+                .invalidateHttpSession(true)
                 .and()
-                .formLogin();//使用form表单登录
+                .authorizeRequests()//配置安全策略
+                .anyRequest().authenticated()//其余的所有请求都需要验证
+                .and()
+                .csrf().disable()//不设置这个，单点登出无效
+        ;//使用form表单登录
 
-        http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint())
-                .and()
+        http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint());
+
+        SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
+        singleSignOutFilter.setCasServerUrlPrefix(casProperties.getCasServerUrl());
+
+        http
                 .addFilter(casAuthenticationFilter())
                 .addFilterBefore(casLogoutFilter(), LogoutFilter.class)
-                .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter.class);
+                .addFilterBefore(singleSignOutFilter, CasAuthenticationFilter.class);
 
         //http.csrf().disable(); //禁用CSRF
     }
@@ -98,7 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * CAS认证过滤器
      */
-    @Bean
+//    @Bean
     public CasAuthenticationFilter casAuthenticationFilter() throws Exception {
         CasAuthenticationFilter casAuthenticationFilter = new CasAuthenticationFilter();
         casAuthenticationFilter.setAuthenticationManager(authenticationManager());
@@ -152,7 +160,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * 请求单点退出过滤器
      */
-    @Bean
+//    @Bean
     public LogoutFilter casLogoutFilter() {
         LogoutFilter logoutFilter = new LogoutFilter(casProperties.getCasServerLogoutUrl(), new SecurityContextLogoutHandler());
         logoutFilter.setFilterProcessesUrl(casProperties.getAppLogoutUrl());
